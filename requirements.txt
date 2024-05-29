@@ -1,0 +1,7 @@
+opencv-python==4.9.0.80
+pytesseract==0.3.10
+deepl==1.18.0
+fastapi==0.111.0
+pydantic==2.7.1
+requests==2.31.0
+uvicorn==0.29.0
