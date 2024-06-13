@@ -23,7 +23,10 @@ ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata/
 
 # Copiar el archivo requirements.txt y instalar dependencias de Python
 COPY requirements.txt .
-RUN sudo pip install --no-cache-dir -r requirements.txt
+USER exchi-user
+
+RUN pip install --no-cache-dir -r requirements.txt
+
 
 
 # Copia el código de la aplicación
