@@ -20,6 +20,7 @@ RUN apt-get update && apt-get install -y \
 
 # Establece la variable de entorno TESSDATA_PREFIX
 ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata/
+RUN apt-get update && apt-get install -y build-essential portaudio19-dev python3-dev
 
 # Copiar el archivo requirements.txt y instalar dependencias de Python
 COPY requirements.txt .
