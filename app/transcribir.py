@@ -2,28 +2,25 @@ import speech_recognition as sr
 import pyaudio
 import wave
 
+class Transcribir:
+    def __init__(
+        self,
+        formato: pyaudio.paInt16,
+        canales: int,
+        tasa_muestreo: int,
+        tamanio_bufer: int,
+        duracion_grabacion: int,
+        ruta_archivo: str,
+    ):
+        self.formato = formato
+        self.canales = canales
+        self.tasa_muestreo = tasa_muestreo
+        self.tamanio_bufer = tamanio_bufer
+        self.duracion_grabacion = duracion_grabacion
+        self.ruta_archivo = ruta_archivo
 
-def transcribir_func(iniciar_escucha):
-
-    class Transcribir:
-        def __init__(
-            self,
-            formato: pyaudio.paInt16,
-            canales: int,
-            tasa_muestreo: int,
-            tamanio_bufer: int,
-            duracion_grabacion: int,
-            ruta_archivo: str,
-        ):
-            self.formato = formato
-            self.canales = canales
-            self.tasa_muestreo = tasa_muestreo
-            self.tamanio_bufer = tamanio_bufer
-            self.duracion_grabacion = duracion_grabacion
-            self.ruta_archivo = ruta_archivo
-
-            self.escuchando = False
-            self.texto_transcrito = ""
+        self.escuchando = False
+        self.texto_transcrito = ""
 
     def iniciar_escucha(self):
         if not self.escuchando:
@@ -120,7 +117,7 @@ tamanio_bufer = 1024
 duracion_grabacion = 15
 ruta_archivo = "audio_grabacion.wav"
 
-transcribir = transcribir_func(
+transcribir = Transcribir(
     formato, canales, tasa_muestreo, tamanio_bufer, duracion_grabacion, ruta_archivo
 )
 
