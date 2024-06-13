@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from app.traductor import traductor_func
 from app.video import video_func
 from app.scanTexto import scanTexto_func
+from app.transcribir import transcribir_func
 import os
 
 app = FastAPI()
@@ -69,3 +70,18 @@ async def traductor_endpoint(traductor_data: TraductorRequest):
     target_lang = traductor_data.target_lang
     traduccion = traductor_func(translate_text, target_lang)
     return {"data": traduccion}
+
+class TranscribirRequest(BaseModel):
+    iniciar_escucha: str
+    recibir_texto_transcrito: str
+    parar_escucha: str
+
+
+@app.post("/transcribir")
+async def transcribir_endpoint(transcribir_data: TranscribirRequest):
+    iniciar_escucha = transcribir_data.iniciar_escucha
+    recibir_texto_transcrito = transcribir_data.recibir_texto_transcrito
+    parar_escucha = transcribir_data.parar_escucha
+    transcripcion = transcribir_func(iniciar_escucha, recibir_texto_transcrito, parar_escucha)
+    return {"data": transcripcion}
+
