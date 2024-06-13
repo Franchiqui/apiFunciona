@@ -1,5 +1,6 @@
 import cv2
 import pytesseract
+import os
 
 def scanTexto_func(imagePath):
     """
@@ -15,9 +16,9 @@ def scanTexto_func(imagePath):
     # Cargar la imagen
     img = cv2.imread(imagePath)
 
-    # Compruebe si la imagen se leyó correctamente.
+    # Comprobar si la imagen se leyó correctamente.
     if img is None:
-        raise Exception("Error loading image: {}".format(imagePath))
+        raise Exception(f"Error loading image: {imagePath}")
 
     # Convertir la imagen a escala de grises
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -26,13 +27,11 @@ def scanTexto_func(imagePath):
     threshold_img = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
 
     # Establecer la ruta de Tesseract
-    pytesseract.pytesseract.tesseract_cmd = r'C:/Archivos de programa/Tesseract-OCR/tesseract.exe'
-
-    # Establecer el idioma del texto
-    text = pytesseract.image_to_string(img, config='--psm 10 lang=es')
+    pytesseract.pytesseract.tesseract_cmd = '/usr/bin/tesseract'
+    os.environ['TESSDATA_PREFIX'] = '/usr/share/tesseract-ocr/5/tessdata/'
 
     # Extraer texto usando pytesseract
-    text = pytesseract.image_to_string(threshold_img)
+    text = pytesseract.image_to_string(threshold_img, lang='spa')
 
     # Devolver el texto extraído
     return text

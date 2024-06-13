@@ -1,8 +1,9 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, UploadFile, File, HTTPException
 from pydantic import BaseModel
 from app.traductor import traductor_func
 from app.video import video_func
 from app.scanTexto import scanTexto_func
+import os
 
 app = FastAPI()
 
@@ -11,15 +12,12 @@ class Libro(BaseModel):
     autor: str
     paginas: int
     editorial: str
-    
-class ScanTexto(BaseModel):
-    image_path: str
 
 @app.get("/")
 def index():
-    return {"message" : "Hola, Pythonianos"}
+    return {"message": "Hola, Pythonianos"}
 
-@app.get("/libros/({id}")
+@app.get("/libros/{id}")
 def mostrar_libro(id: int):
     return {"data": id}
 
@@ -29,29 +27,33 @@ def mostrar_libros():
 
 @app.post("/libros")
 def insertar_libro(libro: Libro):
-    return {"message": f"libro (libro.titulo) insertado"}
+    return {"message": f"Libro {libro.titulo} insertado"}
 
 @app.put("/libros/{id}")
 def actualizar_libro(id: int, libro: Libro):
-    return {"message": f"libro (libro.titulo) actualizado"}
+    return {"message": f"Libro {libro.titulo} actualizado"}
 
 @app.delete("/libros/{id}")
 def eliminar_libro(id: int):
-    return {"message": f"libro (libro.titulo) eliminado"}
+    return {"message": f"Libro {id} eliminado"}
 
-
-    
 @app.post("/scanTexto")
-async def scanTexto_endpoint(request: Request, scanTexto_data: ScanTexto):
-    image_path = scanTexto_data.image_path
-
+async def scanTexto_endpoint(file: UploadFile = File(...)):
     try:
-        escaner = scanTexto_func(image_path)
+        # Guardar el archivo subido
+        file_location = f"/tmp/{file.filename}"
+        with open(file_location, "wb+") as file_object:
+            file_object.write(file.file.read())
+
+        # Escanear el texto
+        escaner = scanTexto_func(file_location)
+
+        # Eliminar el archivo después de procesarlo
+        os.remove(file_location)
+
         return {"data": escaner}
     except Exception as e:
-        print(f"Error extracting text: {e}")
-        return {"error": str(e)}
-
+        raise HTTPException(status_code=500, detail=f"Error extracting text: {str(e)}")
 
 class TraductorRequest(BaseModel):
     translate_text: str
@@ -62,9 +64,8 @@ def video():
     return video_func()
 
 @app.post("/traductor")
-async def traductor_endpoint(request: Request, traductor_data: TraductorRequest):
+async def traductor_endpoint(traductor_data: TraductorRequest):
     translate_text = traductor_data.translate_text
     target_lang = traductor_data.target_lang
     traduccion = traductor_func(translate_text, target_lang)
     return {"data": traduccion}
-

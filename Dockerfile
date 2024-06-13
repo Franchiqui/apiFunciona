@@ -8,25 +8,28 @@ ENV PYTHONUNBUFFERED=1
 # Establece el directorio de trabajo dentro del contenedor
 WORKDIR /app
 
-# Copiar el archivo de requerimientos
-COPY requirements.txt .
-
 RUN python -m venv venv
 
 RUN /bin/bash -c "source venv/bin/activate"
 
-RUN apt-get update \
-    && apt-get install -y libgl1-mesa-glx \
-    && rm -rf /var/lib/apt/lists/*
+# Instala Tesseract y sus datos de idioma
+RUN apt-get update && apt-get install -y \
+    tesseract-ocr \
+    tesseract-ocr-spa \
+    libtesseract-dev
 
-# Instalar las dependencias
-RUN pip install -r requirements.txt
+# Establece la variable de entorno TESSDATA_PREFIX
+ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/5/tessdata/
 
-# Copiar todo el contenido del directorio actual al directorio de trabajo del contenedor
-COPY . .
+# Copiar el archivo requirements.txt y instalar dependencias de Python
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copia el código de la aplicación
+COPY . /app
 
 # Exponer el puerto 8000 en el contenedor
-EXPOSE 30
+EXPOSE 8000
 
 # Comando para ejecutar la aplicación utilizando uvicorn
-CMD ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "30"]
+CMD ["uvicorn", "main:app", "--reload", "--host", "0.0.0.0", "--port", "8000"]
